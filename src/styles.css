@@ -344,15 +344,15 @@
    ANIMATIONS — MICRO INTERACTIONS
    ═══════════════════════════════════════════════════════════════════ */
 
-/* Tap/Press */
+/* Tap/Press *//* Tap/Press */
 @utility press {
   transition: transform 120ms var(--ease-spring), box-shadow 120ms var(--ease-spring);
 }
-@utility press:active {
+
+.press:active {
   transform: scale(0.96);
   box-shadow: none;
 }
-
 /* Satisfying tap for large buttons */
 @utility tap-lg {
   transition: transform 150ms var(--ease-bounce), filter 150ms;
