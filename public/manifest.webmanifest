@@ -1,0 +1,26 @@
+{
+  "name": "سكينة — تطبيقك الإسلامي",
+  "short_name": "سكينة",
+  "description": "القرآن الكريم، مواقيت الصلاة، القبلة، الأذكار، التسبيح، الختمة، البحث والتقويم الهجري.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0a1a14",
+  "theme_color": "#0B3D2E",
+  "lang": "ar",
+  "dir": "rtl",
+  "categories": ["lifestyle", "education", "books"],
+  "prefer_related_applications": false,
+  "shortcuts": [
+    { "name": "القرآن", "url": "/quran", "description": "القرآن الكريم" },
+    { "name": "الأذكار", "url": "/adhkar", "description": "أذكار الصباح والمساء" },
+    { "name": "مواقيت الصلاة", "url": "/prayer", "description": "أوقات الصلاة" },
+    { "name": "المسبحة", "url": "/tasbeeh", "description": "عداد التسبيح" }
+  ],
+  "icons": [
+    { "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

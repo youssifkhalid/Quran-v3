@@ -1,0 +1,45 @@
+{
+  "name": "سكينة — تطبيق إسلامي",
+  "description": "تطبيق إسلامي متكامل: القرآن الكريم، مواقيت الصلاة، الأذكار، AI إسلامي، الختمة والمزيد.",
+  "framework": "tanstack-start",
+  "buildCommand": "bun run build",
+  "devCommand": "bun run dev",
+  "outputDirectory": ".output",
+  "nodeVersion": "20",
+  "environmentVariables": [
+    {
+      "name": "ANTHROPIC_API_KEY",
+      "description": "مفتاح Anthropic API لميزة المساعد الإسلامي AI",
+      "required": true,
+      "secret": true
+    }
+  ],
+  "features": [
+    "قرآن كريم برسم عثماني",
+    "مواقيت الصلاة والقبلة",
+    "الأذكار من حصن المسلم",
+    "مساعد إسلامي AI بمصادر موثوقة",
+    "بحث في آيات القرآن",
+    "ختمة القرآن مع خريطة تقدم",
+    "مشغل صوت عالمي",
+    "PWA offline-first"
+  ],
+  "routes": {
+    "/": "الرئيسية",
+    "/quran": "القرآن الكريم",
+    "/quran/search": "بحث في الآيات",
+    "/mushaf/:page": "المصحف الشريف",
+    "/reciters": "الشيوخ والقراء",
+    "/prayer": "مواقيت الصلاة",
+    "/qibla": "اتجاه القبلة",
+    "/adhkar": "الأذكار",
+    "/tasbeeh": "المسبحة",
+    "/ai-chat": "المساعد الإسلامي AI",
+    "/dua": "الأدعية",
+    "/khatmah": "ختمة القرآن",
+    "/bookmarks": "الإشارات المرجعية",
+    "/search": "بحث شامل",
+    "/tools": "أدوات إسلامية",
+    "/settings": "الإعدادات"
+  }
+}

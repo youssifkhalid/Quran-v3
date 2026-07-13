@@ -1,0 +1,1019 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/* ═══════════════════════════════════════════════════════════════════
+   سكينة v2  — Emerald Serenity Design System
+   Premium Islamic PWA — crafted for soul & serenity
+   ═══════════════════════════════════════════════════════════════════ */
+
+@theme inline {
+  --radius-sm:  calc(var(--radius) - 4px);
+  --radius-md:  calc(var(--radius) - 2px);
+  --radius-lg:  var(--radius);
+  --radius-xl:  calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 14px);
+  --radius-4xl: calc(var(--radius) + 24px);
+
+  --color-background:         var(--background);
+  --color-foreground:         var(--foreground);
+  --color-card:               var(--card);
+  --color-card-foreground:    var(--card-foreground);
+  --color-popover:            var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary:            var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary-glow:       var(--primary-glow);
+  --color-secondary:          var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted:              var(--muted);
+  --color-muted-foreground:   var(--muted-foreground);
+  --color-accent:             var(--accent);
+  --color-accent-foreground:  var(--accent-foreground);
+  --color-gold:               var(--gold);
+  --color-gold-foreground:    var(--gold-foreground);
+  --color-destructive:        var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border:             var(--border);
+  --color-input:              var(--input);
+  --color-ring:               var(--ring);
+  --color-surface:            var(--surface);
+  --color-surface-elevated:   var(--surface-elevated);
+
+  --font-display: "Amiri", "Scheherazade New", serif;
+  --font-arabic:  "Amiri Quran", "Amiri", "Scheherazade New", serif;
+  --font-sans:    "Cairo", "Tajawal", system-ui, -apple-system, sans-serif;
+
+  /* Spring easing */
+  --ease-spring:   cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-bounce:   cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-smooth:   cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-snap:     cubic-bezier(0.87, 0, 0.13, 1);
+}
+
+/* ── Light mode ── */
+:root {
+  --radius: 1.1rem;
+
+  --background:       oklch(0.985 0.010 95);
+  --foreground:       oklch(0.17 0.040 165);
+
+  --surface:          oklch(1    0.004 95);
+  --surface-elevated: oklch(0.995 0.007 95);
+
+  --card:             oklch(1    0.004 95);
+  --card-foreground:  oklch(0.17 0.040 165);
+
+  --popover:          oklch(1    0.004 95);
+  --popover-foreground: oklch(0.17 0.040 165);
+
+  --primary:          oklch(0.35 0.085 162);
+  --primary-foreground: oklch(0.98 0.010 95);
+  --primary-glow:     oklch(0.52 0.13  162);
+
+  --secondary:        oklch(0.94 0.020 150);
+  --secondary-foreground: oklch(0.25 0.05 162);
+
+  --muted:            oklch(0.93 0.014 100);
+  --muted-foreground: oklch(0.50 0.030 155);
+
+  --accent:           oklch(0.92 0.040  90);
+  --accent-foreground: oklch(0.25 0.05 162);
+
+  --gold:             oklch(0.74 0.130  80);
+  --gold-foreground:  oklch(0.17 0.040 165);
+
+  --destructive:      oklch(0.55 0.200  27);
+  --destructive-foreground: oklch(0.98 0.010 95);
+
+  --border:           oklch(0.88 0.018 100);
+  --input:            oklch(0.92 0.014 100);
+  --ring:             oklch(0.52 0.130 162);
+
+  /* Gradients */
+  --g-primary: linear-gradient(135deg, oklch(0.30 0.09 162), oklch(0.44 0.12 162));
+  --g-hero:    linear-gradient(165deg, oklch(0.27 0.09 163) 0%, oklch(0.16 0.06 167) 55%, oklch(0.11 0.04 170) 100%);
+  --g-gold:    linear-gradient(135deg, oklch(0.84 0.13  85), oklch(0.66 0.14  74));
+  --g-card:    linear-gradient(180deg, oklch(1    0.004 95), oklch(0.97 0.010 95));
+  --g-teal:    linear-gradient(135deg, oklch(0.60 0.10 195), oklch(0.45 0.12 200));
+  --g-rose:    linear-gradient(135deg, oklch(0.65 0.18  15), oklch(0.50 0.20  20));
+  --g-amber:   linear-gradient(135deg, oklch(0.80 0.15  80), oklch(0.65 0.16  70));
+
+  /* Shadows */
+  --shadow-xs:       0 1px 2px oklch(0.17 0.04 165 / 0.03);
+  --shadow-soft:     0 2px 8px oklch(0.17 0.04 165 / 0.04), 0 1px 2px oklch(0.17 0.04 165 / 0.04);
+  --shadow-elevated: 0 8px 30px -6px oklch(0.17 0.04 165 / 0.10), 0 2px 4px oklch(0.17 0.04 165 / 0.05);
+  --shadow-glow:     0 0 0 1px oklch(0.52 0.13 162 / 0.12), 0 4px 20px -4px oklch(0.52 0.13 162 / 0.30);
+  --shadow-gold:     0 4px 24px -6px oklch(0.74 0.13 80 / 0.45);
+  --shadow-hero:     0 20px 60px -15px oklch(0.17 0.04 165 / 0.20);
+  --shadow-card:     0 1px 0 oklch(0 0 0 / 0.04) inset, 0 2px 8px oklch(0.17 0.04 165 / 0.04);
+}
+
+/* ── Dark mode ── */
+.dark {
+  --background:       oklch(0.13 0.025 165);
+  --foreground:       oklch(0.96 0.012 95);
+
+  --surface:          oklch(0.17 0.028 165);
+  --surface-elevated: oklch(0.21 0.032 165);
+
+  --card:             oklch(0.18 0.028 165);
+  --card-foreground:  oklch(0.96 0.012 95);
+
+  --popover:          oklch(0.18 0.028 165);
+  --popover-foreground: oklch(0.96 0.012 95);
+
+  --primary:          oklch(0.62 0.145 162);
+  --primary-foreground: oklch(0.10 0.020 165);
+  --primary-glow:     oklch(0.72 0.160 162);
+
+  --secondary:        oklch(0.25 0.038 165);
+  --secondary-foreground: oklch(0.96 0.012 95);
+
+  --muted:            oklch(0.23 0.030 165);
+  --muted-foreground: oklch(0.68 0.018 100);
+
+  --accent:           oklch(0.29 0.048 165);
+  --accent-foreground: oklch(0.96 0.012 95);
+
+  --gold:             oklch(0.79 0.140  80);
+  --gold-foreground:  oklch(0.13 0.025 165);
+
+  --destructive:      oklch(0.62 0.200  27);
+  --destructive-foreground: oklch(0.98 0.010 95);
+
+  --border:           oklch(1 0 0 / 7%);
+  --input:            oklch(1 0 0 / 11%);
+  --ring:             oklch(0.62 0.145 162);
+
+  --g-primary: linear-gradient(135deg, oklch(0.38 0.10 162), oklch(0.54 0.13 162));
+  --g-hero:    linear-gradient(165deg, oklch(0.21 0.05 165) 0%, oklch(0.15 0.04 168) 55%, oklch(0.09 0.025 170) 100%);
+  --g-gold:    linear-gradient(135deg, oklch(0.84 0.13 85), oklch(0.70 0.14 74));
+  --g-card:    linear-gradient(180deg, oklch(0.21 0.03 165), oklch(0.17 0.028 165));
+  --g-teal:    linear-gradient(135deg, oklch(0.55 0.11 195), oklch(0.40 0.12 200));
+  --g-rose:    linear-gradient(135deg, oklch(0.60 0.19 15), oklch(0.46 0.20 20));
+  --g-amber:   linear-gradient(135deg, oklch(0.78 0.15 80), oklch(0.63 0.16 70));
+
+  --shadow-soft:     0 2px 8px oklch(0 0 0 / 0.30), 0 1px 2px oklch(0 0 0 / 0.20);
+  --shadow-elevated: 0 8px 40px -8px oklch(0 0 0 / 0.55), 0 2px 6px oklch(0 0 0 / 0.30);
+  --shadow-glow:     0 0 0 1px oklch(0.62 0.145 162 / 0.20), 0 4px 24px -4px oklch(0.62 0.145 162 / 0.38);
+  --shadow-gold:     0 4px 24px -6px oklch(0.79 0.14 80 / 0.38);
+  --shadow-hero:     0 20px 60px -15px oklch(0 0 0 / 0.60);
+  --shadow-card:     0 1px 0 oklch(1 0 0 / 0.06) inset, 0 2px 8px oklch(0 0 0 / 0.25);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   BASE STYLES
+   ═══════════════════════════════════════════════════════════════════ */
+@layer base {
+  * { border-color: var(--color-border); }
+
+  html {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    scroll-behavior: smooth;
+  }
+
+  html[dir="rtl"] body { font-family: var(--font-sans); }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    font-feature-settings: "ss01", "kern";
+    overscroll-behavior: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .font-quran {
+    font-family: var(--font-arabic);
+    font-size: 1.75rem;
+    line-height: 2.3;
+    letter-spacing: 0;
+    font-weight: 400;
+  }
+
+  .text-arabic {
+    font-family: var(--font-arabic);
+    line-height: 2.0;
+  }
+
+  ::selection {
+    background: var(--color-primary-glow);
+    color: var(--color-primary-foreground);
+  }
+
+  ::-webkit-scrollbar        { width: 4px; height: 4px; }
+  ::-webkit-scrollbar-track  { background: transparent; }
+  ::-webkit-scrollbar-thumb  { background: oklch(0.5 0.05 165 / 0.20); border-radius: 9999px; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   GRADIENT UTILITIES
+   ═══════════════════════════════════════════════════════════════════ */
+@utility gradient-primary  { background: var(--g-primary); }
+@utility gradient-hero     { background: var(--g-hero); }
+@utility gradient-gold     { background: var(--g-gold); }
+@utility gradient-card     { background: var(--g-card); }
+@utility gradient-teal     { background: var(--g-teal); }
+@utility gradient-rose     { background: var(--g-rose); }
+@utility gradient-amber    { background: var(--g-amber); }
+
+@utility text-gradient-gold {
+  background: var(--g-gold);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+@utility text-gradient-primary {
+  background: var(--g-primary);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   SHADOW UTILITIES
+   ═══════════════════════════════════════════════════════════════════ */
+@utility shadow-xs       { box-shadow: var(--shadow-xs); }
+@utility shadow-soft     { box-shadow: var(--shadow-soft); }
+@utility shadow-elevated { box-shadow: var(--shadow-elevated); }
+@utility shadow-glow     { box-shadow: var(--shadow-glow); }
+@utility shadow-gold     { box-shadow: var(--shadow-gold); }
+@utility shadow-hero     { box-shadow: var(--shadow-hero); }
+@utility shadow-card     { box-shadow: var(--shadow-card); }
+
+/* ═══════════════════════════════════════════════════════════════════
+   GLASS EFFECTS
+   ═══════════════════════════════════════════════════════════════════ */
+@utility glass {
+  background: color-mix(in oklab, var(--surface) 72%, transparent);
+  backdrop-filter: blur(24px) saturate(150%);
+  -webkit-backdrop-filter: blur(24px) saturate(150%);
+  border: 1px solid color-mix(in oklab, var(--foreground) 7%, transparent);
+}
+@utility glass-dark {
+  background: color-mix(in oklab, var(--background) 78%, transparent);
+  backdrop-filter: blur(28px) saturate(160%);
+  -webkit-backdrop-filter: blur(28px) saturate(160%);
+  border: 1px solid color-mix(in oklab, var(--gold) 10%, transparent);
+}
+@utility glass-gold {
+  background: color-mix(in oklab, var(--gold) 8%, var(--card));
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid color-mix(in oklab, var(--gold) 20%, transparent);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   PATTERN OVERLAYS
+   ═══════════════════════════════════════════════════════════════════ */
+@utility pattern-islamic {
+  background-image:
+    radial-gradient(circle at 50% 0%, color-mix(in oklab, var(--gold) 15%, transparent) 0%, transparent 50%),
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'><g fill='none' stroke='%23d4af37' stroke-width='0.5' stroke-opacity='0.15'><path d='M40 0 L80 40 L40 80 L0 40 Z'/><path d='M40 14 L66 40 L40 66 L14 40 Z'/><circle cx='40' cy='40' r='8' stroke-opacity='0.20'/><line x1='40' y1='0' x2='40' y2='80' stroke-opacity='0.08'/><line x1='0' y1='40' x2='80' y2='40' stroke-opacity='0.08'/></g></svg>");
+  background-size: cover, 80px 80px;
+}
+@utility pattern-stars {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'><g fill='%23d4af37' fill-opacity='0.08'><polygon points='30,5 32,22 48,22 35,32 40,48 30,38 20,48 25,32 12,22 28,22' /></g></svg>");
+  background-size: 60px 60px;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   ANIMATIONS — PAGE TRANSITIONS
+   ═══════════════════════════════════════════════════════════════════ */
+
+@keyframes page-in {
+  from { opacity: 0; transform: translateY(16px) scale(0.99); }
+  to   { opacity: 1; transform: translateY(0)   scale(1); }
+}
+@utility fade-up {
+  animation: page-in 0.45s var(--ease-spring) both;
+}
+
+@keyframes slide-in-right {
+  from { opacity: 0; transform: translateX(24px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@utility slide-in {
+  animation: slide-in-right 0.40s var(--ease-spring) both;
+}
+
+@keyframes slide-up-sheet {
+  from { transform: translateY(100%); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+@utility slide-up {
+  animation: slide-up-sheet 0.38s var(--ease-spring) both;
+}
+
+/* Stagger children */
+@utility stagger > * { animation: page-in 0.45s var(--ease-spring) both; }
+@utility stagger > *:nth-child(1) { animation-delay: 0.05s; }
+@utility stagger > *:nth-child(2) { animation-delay: 0.10s; }
+@utility stagger > *:nth-child(3) { animation-delay: 0.15s; }
+@utility stagger > *:nth-child(4) { animation-delay: 0.20s; }
+@utility stagger > *:nth-child(5) { animation-delay: 0.25s; }
+@utility stagger > *:nth-child(6) { animation-delay: 0.30s; }
+
+/* ═══════════════════════════════════════════════════════════════════
+   ANIMATIONS — MICRO INTERACTIONS
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* Tap/Press */
+@utility press {
+  transition: transform 120ms var(--ease-spring), box-shadow 120ms var(--ease-spring);
+}
+@utility press:active {
+  transform: scale(0.96);
+  box-shadow: none;
+}
+
+/* Satisfying tap for large buttons */
+@utility tap-lg {
+  transition: transform 150ms var(--ease-bounce), filter 150ms;
+}
+@utility tap-lg:active {
+  transform: scale(0.93);
+  filter: brightness(0.92);
+}
+
+/* Ripple on tap */
+@keyframes ripple {
+  0%   { transform: scale(0); opacity: 0.6; }
+  100% { transform: scale(2.5); opacity: 0; }
+}
+.ripple-parent { position: relative; overflow: hidden; }
+.ripple {
+  position: absolute;
+  border-radius: 50%;
+  background: oklch(1 0 0 / 0.3);
+  width: 100px; height: 100px;
+  margin: -50px 0 0 -50px;
+  animation: ripple 600ms ease-out forwards;
+  pointer-events: none;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   ANIMATIONS — DECORATIVE
+   ═══════════════════════════════════════════════════════════════════ */
+
+@keyframes shimmer-base {
+  0%   { background-position: -200% 0; }
+  100% { background-position:  200% 0; }
+}
+@utility skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--muted) 0%,
+    color-mix(in oklab, var(--muted) 55%, var(--surface)) 50%,
+    var(--muted) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer-base 1.7s ease-in-out infinite;
+  border-radius: var(--radius);
+}
+
+@keyframes float-slow {
+  0%, 100% { transform: translateY(0)    rotate(0deg); }
+  50%       { transform: translateY(-8px) rotate(0.6deg); }
+}
+@utility float-slow { animation: float-slow 6s ease-in-out infinite; }
+
+@keyframes pulse-ring-anim {
+  0%   { transform: scale(0.94); opacity: 1; }
+  100% { transform: scale(1.65); opacity: 0; }
+}
+@utility pulse-ring { animation: pulse-ring-anim 2.4s cubic-bezier(0.4,0,0.6,1) infinite; }
+
+@keyframes spin-slow-anim {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+@utility spin-slow { animation: spin-slow-anim 10s linear infinite; }
+
+/* Gold shimmer on text */
+@keyframes gold-shimmer {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+@utility text-shimmer {
+  background: linear-gradient(90deg,
+    oklch(0.84 0.13 85),
+    oklch(0.95 0.10 90),
+    oklch(0.74 0.13 80),
+    oklch(0.95 0.10 90),
+    oklch(0.84 0.13 85)
+  );
+  background-size: 300% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: gold-shimmer 3s ease infinite;
+}
+
+/* Number count up */
+@keyframes count-up {
+  from { transform: translateY(6px) scale(0.85); opacity: 0; }
+  to   { transform: translateY(0)   scale(1);    opacity: 1; }
+}
+@utility count-tick { animation: count-up 0.22s var(--ease-bounce) both; }
+
+/* Bounce in */
+@keyframes bounce-in {
+  0%   { transform: scale(0.3);  opacity: 0; }
+  50%  { transform: scale(1.08); opacity: 1; }
+  70%  { transform: scale(0.96); }
+  100% { transform: scale(1); }
+}
+@utility bounce-in { animation: bounce-in 0.45s var(--ease-bounce) both; }
+
+/* Completion burst */
+@keyframes burst {
+  0%   { transform: scale(1);    opacity: 1; }
+  50%  { transform: scale(1.30); opacity: 0.8; }
+  100% { transform: scale(0.9);  opacity: 0; }
+}
+@utility burst { animation: burst 0.5s var(--ease-spring) both; }
+
+/* Pulse glow (prayer alignment) */
+@keyframes glow-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 oklch(0.74 0.13 80 / 0.6); }
+  50%       { box-shadow: 0 0 0 16px oklch(0.74 0.13 80 / 0); }
+}
+@utility glow-pulse { animation: glow-pulse 2s ease-in-out infinite; }
+
+/* Heartbeat for CTA */
+@keyframes heartbeat {
+  0%, 100% { transform: scale(1); }
+  14%       { transform: scale(1.06); }
+  28%       { transform: scale(1); }
+  42%       { transform: scale(1.04); }
+  70%       { transform: scale(1); }
+}
+@utility heartbeat { animation: heartbeat 2.5s ease-in-out infinite; }
+
+/* Wave for audio bars */
+@keyframes wave {
+  0%, 100% { transform: scaleY(0.4); }
+  50%       { transform: scaleY(1); }
+}
+.wave-bar { display: inline-block; width: 3px; background: currentColor; border-radius: 2px; animation: wave 1.2s ease-in-out infinite; }
+.wave-bar:nth-child(2) { animation-delay: 0.1s; }
+.wave-bar:nth-child(3) { animation-delay: 0.2s; }
+.wave-bar:nth-child(4) { animation-delay: 0.3s; }
+.wave-bar:nth-child(5) { animation-delay: 0.4s; }
+
+/* ═══════════════════════════════════════════════════════════════════
+   UI COMPONENTS
+   ═══════════════════════════════════════════════════════════════════ */
+@utility hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.hide-scrollbar::-webkit-scrollbar { display: none; }
+
+@utility pb-safe {
+  padding-bottom: max(env(safe-area-inset-bottom), 0.75rem);
+}
+
+/* Smooth card hover */
+@utility card-hover {
+  transition: transform 200ms var(--ease-spring), box-shadow 200ms var(--ease-spring);
+}
+@utility card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-elevated);
+}
+
+/* Active scale for nav items */
+@utility nav-active {
+  transition: transform 300ms var(--ease-bounce);
+}
+
+/* Text balance */
+@utility text-balance { text-wrap: balance; }
+
+/* Quran text rendering */
+@utility text-quran {
+  font-family: var(--font-arabic);
+  text-rendering: optimizeLegibility;
+  font-feature-settings: "kern" 1;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   INTERACTIVE STATES
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* Nav pill active */
+.nav-pill-active {
+  background: var(--g-primary);
+  color: var(--color-primary-foreground);
+  box-shadow: var(--shadow-glow);
+  transform: scale(1.10);
+  transition: all 300ms var(--ease-bounce);
+}
+
+/* Dhikr card complete state */
+.dhikr-complete {
+  background: color-mix(in oklab, var(--primary) 8%, var(--card));
+  border-color: color-mix(in oklab, var(--primary) 25%, transparent);
+  animation: dhikr-done 0.4s var(--ease-bounce);
+}
+@keyframes dhikr-done {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.025); }
+  100% { transform: scale(1); }
+}
+
+/* Progress track */
+.progress-track {
+  background: var(--muted);
+  border-radius: 9999px;
+  overflow: hidden;
+}
+.progress-fill {
+  background: var(--g-gold);
+  border-radius: 9999px;
+  transition: width 600ms var(--ease-spring);
+}
+.progress-fill-primary {
+  background: var(--g-primary);
+  border-radius: 9999px;
+  transition: width 600ms var(--ease-spring);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   RESPONSIVE LAYOUT SYSTEM — سكينة v3
+   Mobile → Tablet → Desktop unified grid
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ── Layout Shell ── */
+.app-layout {
+  display: grid;
+  min-height: 100dvh;
+  grid-template-rows: auto 1fr;
+  grid-template-columns: 1fr;
+}
+
+/* Tablet ≥ 768px */
+@media (min-width: 768px) {
+  .app-layout {
+    grid-template-columns: 240px 1fr;
+    grid-template-rows: 1fr;
+  }
+  .app-sidebar {
+    display: flex !important;
+    position: sticky;
+    top: 0;
+    height: 100dvh;
+    overflow-y: auto;
+    border-left: 1px solid var(--color-border);
+    border-radius: 0;
+  }
+  .app-bottom-nav { display: none !important; }
+  .app-main { overflow-y: auto; height: 100dvh; }
+}
+
+/* Desktop ≥ 1280px */
+@media (min-width: 1280px) {
+  .app-layout {
+    grid-template-columns: 260px 1fr 300px;
+  }
+  .app-aside { display: flex !important; }
+}
+
+/* ── Page grid containers ── */
+.page-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+@media (min-width: 600px) {
+  .page-grid-2 { grid-template-columns: repeat(2, 1fr); }
+}
+@media (min-width: 1024px) {
+  .page-grid-2 { grid-template-columns: repeat(3, 1fr); }
+}
+
+.page-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+}
+@media (min-width: 600px) {
+  .page-grid-3 { grid-template-columns: repeat(3, 1fr); }
+}
+@media (min-width: 1024px) {
+  .page-grid-3 { grid-template-columns: repeat(4, 1fr); }
+}
+
+/* ── Desktop sidebar nav ── */
+.sidebar-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.625rem 1rem;
+  border-radius: var(--radius-xl);
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-muted-foreground);
+  transition: all 200ms var(--ease-spring);
+  white-space: nowrap;
+  cursor: pointer;
+  text-decoration: none;
+}
+.sidebar-nav-item:hover {
+  background: color-mix(in oklab, var(--primary) 8%, transparent);
+  color: var(--color-foreground);
+}
+.sidebar-nav-item.active {
+  background: var(--g-primary);
+  color: var(--color-primary-foreground);
+  box-shadow: var(--shadow-glow);
+}
+.sidebar-nav-item .nav-icon {
+  width: 2rem;
+  height: 2rem;
+  display: grid;
+  place-items: center;
+  border-radius: var(--radius-md);
+  flex-shrink: 0;
+  transition: transform 200ms var(--ease-bounce);
+}
+.sidebar-nav-item.active .nav-icon {
+  transform: scale(1.08);
+}
+
+/* ── Keyboard shortcut badge ── */
+.kbd {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.1rem 0.4rem;
+  border-radius: 0.375rem;
+  font-size: 0.625rem;
+  font-weight: 700;
+  font-family: var(--font-sans);
+  background: color-mix(in oklab, var(--muted) 80%, transparent);
+  color: var(--color-muted-foreground);
+  border: 1px solid var(--color-border);
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+  line-height: 1.4;
+}
+
+/* ── Quick action fab ── */
+.fab {
+  position: fixed;
+  bottom: calc(5.5rem + env(safe-area-inset-bottom));
+  left: 1rem;
+  z-index: 35;
+  width: 3.25rem;
+  height: 3.25rem;
+  border-radius: 1rem;
+  background: var(--g-gold);
+  color: var(--color-gold-foreground);
+  box-shadow: var(--shadow-gold);
+  display: grid;
+  place-items: center;
+  transition: all 250ms var(--ease-bounce);
+  cursor: pointer;
+  border: none;
+}
+.fab:hover { transform: scale(1.08); }
+.fab:active { transform: scale(0.92); }
+@media (min-width: 768px) { .fab { display: none; } }
+
+/* ── Card variants ── */
+.card-glass {
+  background: color-mix(in oklab, var(--card) 85%, transparent);
+  backdrop-filter: blur(20px) saturate(1.5);
+  border: 1px solid color-mix(in oklab, var(--border) 60%, transparent);
+  border-radius: var(--radius-3xl);
+}
+.card-hero {
+  background: var(--g-hero);
+  color: var(--color-primary-foreground);
+  border-radius: var(--radius-3xl);
+  overflow: hidden;
+  position: relative;
+}
+.card-gold {
+  background: color-mix(in oklab, var(--gold) 10%, var(--card));
+  border: 1px solid color-mix(in oklab, var(--gold) 30%, transparent);
+  border-radius: var(--radius-3xl);
+}
+
+/* ── Responsive typography ── */
+.heading-hero { font-size: clamp(1.75rem, 5vw, 3rem); }
+.heading-page { font-size: clamp(1.5rem, 4vw, 2.25rem); }
+.heading-section { font-size: clamp(1rem, 3vw, 1.5rem); }
+.text-quran-sm { font-size: clamp(1.1rem, 3vw, 1.4rem); line-height: 2.2; }
+.text-quran-md { font-size: clamp(1.4rem, 4vw, 1.8rem); line-height: 2.4; }
+.text-quran-lg { font-size: clamp(1.8rem, 5vw, 2.4rem); line-height: 2.6; }
+
+/* ── Responsive padding ── */
+.page-pad { padding-inline: max(1rem, env(safe-area-inset-right)); }
+@media (min-width: 768px) { .page-pad { padding-inline: 2rem; } }
+@media (min-width: 1280px) { .page-pad { padding-inline: 3rem; } }
+
+/* ── Surah card responsive ── */
+.surah-card-text { font-size: clamp(1.1rem, 3.5vw, 1.6rem); }
+
+/* ── Scroll container ── */
+.scroll-area {
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border) transparent;
+}
+.scroll-area::-webkit-scrollbar { width: 4px; }
+.scroll-area::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 99px;
+}
+
+/* ── Tooltip ── */
+[data-tooltip] { position: relative; }
+[data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--color-foreground);
+  color: var(--color-background);
+  font-size: 0.625rem;
+  font-weight: 600;
+  white-space: nowrap;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.375rem;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 150ms;
+  z-index: 100;
+  font-family: var(--font-sans);
+}
+[data-tooltip]:hover::after { opacity: 1; }
+
+/* ── Bottom sheet ── */
+.bottom-sheet {
+  position: fixed;
+  inset-x: 0;
+  bottom: 0;
+  z-index: 60;
+  border-radius: var(--radius-3xl) var(--radius-3xl) 0 0;
+  background: var(--color-card);
+  border-top: 1px solid var(--color-border);
+  box-shadow: 0 -4px 40px -4px oklch(0 0 0 / 0.3);
+  transform: translateY(0);
+  transition: transform 350ms var(--ease-spring);
+  padding-bottom: max(env(safe-area-inset-bottom), 1.5rem);
+}
+.bottom-sheet.hidden { transform: translateY(100%); }
+
+/* ── Tag / badge ── */
+.badge-mecca { background: oklch(0.85 0.12 85 / 0.15); color: oklch(0.55 0.15 75); }
+.badge-madina { background: oklch(0.75 0.12 160 / 0.15); color: oklch(0.45 0.12 162); }
+.dark .badge-mecca { color: oklch(0.8 0.15 80); }
+.dark .badge-madina { color: oklch(0.7 0.14 162); }
+
+/* ── Loading shimmer ── */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--color-muted) 25%,
+    color-mix(in oklab, var(--muted) 60%, var(--card)) 50%,
+    var(--color-muted) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+  border-radius: var(--radius-lg);
+}
+
+/* ── Hadith book colors ── */
+.book-bukhari  { --book-color: oklch(0.70 0.14 30); }
+.book-muslim   { --book-color: oklch(0.65 0.14 162); }
+.book-abu-dawud { --book-color: oklch(0.60 0.14 260); }
+.book-tirmidhi { --book-color: oklch(0.65 0.13 85); }
+.book-nasai    { --book-color: oklch(0.62 0.14 200); }
+.book-ibn-majah { --book-color: oklch(0.60 0.12 320); }
+.book-nawawi   { --book-color: oklch(0.58 0.18 162); }
+.book-header   { background: var(--book-color); color: white; }
+
+/* ── Verse highlight ── */
+.verse-active { background: oklch(0.82 0.13 85 / 0.2); border-radius: 0.25rem; }
+mark.quran-mark {
+  background: oklch(0.82 0.13 85 / 0.3);
+  color: inherit;
+  border-radius: 2px;
+  padding: 0 2px;
+}
+
+/* ── Calendar grid ── */
+.hijri-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+}
+.hijri-cell {
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  border-radius: var(--radius-md);
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all 150ms;
+}
+.hijri-cell:hover { background: color-mix(in oklab, var(--primary) 10%, transparent); }
+.hijri-cell.today { background: var(--g-primary); color: var(--color-primary-foreground); box-shadow: var(--shadow-glow); }
+.hijri-cell.occasion { background: oklch(0.82 0.13 85 / 0.2); color: oklch(0.55 0.15 75); font-weight: 700; }
+
+/* ═══════════════════════════════════════════════════════════════════
+   SAKEENAH v3 — Final Design System Extensions
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ── Sidebar nav utility ── */
+@utility gradient-card {
+  background: linear-gradient(135deg,
+    color-mix(in oklab, var(--card) 95%, var(--primary) 5%) 0%,
+    var(--card) 100%);
+}
+
+/* ── Gold foreground text on gradient-gold ── */
+@utility text-gold-foreground { color: var(--color-gold-foreground); }
+
+/* ── Micro-interactions ── */
+@keyframes float-gentle {
+  0%, 100% { transform: translateY(0px);  }
+  50%       { transform: translateY(-4px); }
+}
+@utility float-gentle {
+  animation: float-gentle 4s ease-in-out infinite;
+}
+
+@keyframes pop {
+  0%   { transform: scale(1);    }
+  40%  { transform: scale(1.18); }
+  70%  { transform: scale(0.93); }
+  100% { transform: scale(1);    }
+}
+@utility animate-pop {
+  animation: pop 350ms cubic-bezier(0.34,1.56,0.64,1);
+}
+
+/* ── Glass morphism variants ── */
+@utility glass-strong {
+  background: color-mix(in oklab, var(--background) 92%, transparent);
+  backdrop-filter: blur(40px) saturate(1.8);
+  border: 1px solid color-mix(in oklab, var(--border) 70%, transparent);
+}
+@utility glass-card {
+  background: color-mix(in oklab, var(--card) 88%, transparent);
+  backdrop-filter: blur(24px) saturate(1.4);
+  border: 1px solid color-mix(in oklab, var(--border) 50%, transparent);
+}
+
+/* ── Gradient backgrounds ── */
+@utility gradient-emerald {
+  background: linear-gradient(135deg, oklch(0.52 0.14 162), oklch(0.42 0.12 180));
+}
+@utility gradient-sapphire {
+  background: linear-gradient(135deg, oklch(0.50 0.18 240), oklch(0.42 0.15 260));
+}
+@utility gradient-rose {
+  background: linear-gradient(135deg, oklch(0.58 0.18 10), oklch(0.52 0.16 350));
+}
+@utility gradient-amber {
+  background: linear-gradient(135deg, oklch(0.72 0.16 70), oklch(0.65 0.18 50));
+}
+
+/* ── Status indicator ── */
+.live-dot {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+.live-dot::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: oklch(0.62 0.22 25);
+  animation: pulse-ring-anim 1.4s ease-in-out infinite;
+}
+
+/* ── Prose (tafsir text) ── */
+.prose-arabic {
+  font-family: var(--font-arabic);
+  font-size: 1.1rem;
+  line-height: 2.1;
+  direction: rtl;
+  text-align: justify;
+  text-align-last: right;
+  color: var(--color-foreground);
+}
+
+/* ── Quran page frame ── */
+.mushaf-frame {
+  border: 2.5px solid;
+  border-image: linear-gradient(
+    135deg,
+    oklch(0.82 0.13 85),
+    oklch(0.62 0.14 162),
+    oklch(0.82 0.13 85)
+  ) 1;
+  border-radius: var(--radius-3xl);
+  background: color-mix(in oklab, var(--card) 92%, transparent);
+}
+
+/* ── Responsive grid shorthand ── */
+.grid-responsive-2 {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.75rem;
+}
+@media (min-width: 480px) {
+  .grid-responsive-2 { grid-template-columns: repeat(2, 1fr); }
+}
+@media (min-width: 1024px) {
+  .grid-responsive-2 { grid-template-columns: repeat(3, 1fr); }
+}
+
+.grid-responsive-3 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.625rem;
+}
+@media (min-width: 480px) {
+  .grid-responsive-3 { grid-template-columns: repeat(3, 1fr); }
+}
+@media (min-width: 768px) {
+  .grid-responsive-3 { grid-template-columns: repeat(4, 1fr); }
+}
+
+/* ── Text responsive ── */
+.text-responsive-title  { font-size: clamp(1.25rem, 4vw, 2rem);   }
+.text-responsive-body   { font-size: clamp(0.875rem, 2.5vw, 1rem); }
+.text-responsive-quran  { font-size: clamp(1.3rem, 4vw, 1.9rem);  }
+.text-responsive-quran-lg { font-size: clamp(1.6rem, 5vw, 2.4rem); }
+
+/* ── Truncate lines ── */
+.line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.line-clamp-3 { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+
+/* ── Hadith book top bar ── */
+.book-bar-bukhari  { background: oklch(0.70 0.14 30);  }
+.book-bar-muslim   { background: oklch(0.55 0.16 162); }
+.book-bar-abu-dawud{ background: oklch(0.55 0.18 250); }
+.book-bar-tirmidhi { background: oklch(0.65 0.15 80);  }
+.book-bar-nasai    { background: oklch(0.56 0.16 200); }
+.book-bar-ibn-majah{ background: oklch(0.55 0.15 320); }
+.book-bar-nawawi   { background: oklch(0.52 0.18 162); }
+
+/* ── Sidebar group label ── */
+.sidebar-group-label {
+  font-size: 0.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: color-mix(in oklab, var(--muted-foreground) 50%, transparent);
+  padding: 0 0.75rem;
+  margin-bottom: 0.25rem;
+}
+
+/* ── Focus ring ── */
+*:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  border-radius: var(--radius-md);
+}
+
+/* ── Print optimisation ── */
+@media print {
+  .app-bottom-nav, .fab, aside { display: none !important; }
+  .font-quran { font-family: "Amiri", serif !important; }
+}
+
+/* ── Reduce motion ── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ── High contrast mode ── */
+@media (forced-colors: active) {
+  .gradient-primary, .gradient-gold { background: ButtonFace; color: ButtonText; }
+  .shadow-glow, .shadow-gold, .shadow-elevated { box-shadow: none; }
+}

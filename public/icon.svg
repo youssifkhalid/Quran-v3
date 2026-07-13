@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0B3D2E"/>
+      <stop offset="100%" stop-color="#1a6b4a"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F5C842"/>
+      <stop offset="100%" stop-color="#E8A800"/>
+    </linearGradient>
+  </defs>
+  <!-- Background -->
+  <rect width="512" height="512" rx="120" fill="url(#bg)"/>
+  <!-- Arabic letter ص (Sakeenah) -->
+  <text x="256" y="330" text-anchor="middle" font-family="'Amiri', 'Arabic Typesetting', serif"
+    font-size="240" fill="url(#gold)" opacity="0.95">س</text>
+  <!-- Subtle star decoration top -->
+  <circle cx="256" cy="100" r="8" fill="url(#gold)" opacity="0.6"/>
+  <circle cx="230" cy="115" r="5" fill="url(#gold)" opacity="0.4"/>
+  <circle cx="282" cy="115" r="5" fill="url(#gold)" opacity="0.4"/>
+</svg>
