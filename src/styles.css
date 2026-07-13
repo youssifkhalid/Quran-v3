@@ -357,7 +357,7 @@
 @utility tap-lg {
   transition: transform 150ms var(--ease-bounce), filter 150ms;
 }
-@utility tap-lg:active {
+@utility tap-lg{
   transform: scale(0.93);
   filter: brightness(0.92);
 }
