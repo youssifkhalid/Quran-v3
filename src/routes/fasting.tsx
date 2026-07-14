@@ -1,13 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState, useEffect, useMemo } from "react";
-import { Moon, Sun, CheckCircle2, Circle, Trophy, CalendarDays, Droplet, RotateCcw } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Moon, CheckCircle2, Circle, Trophy, Sun } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/fasting")({
   head: () => ({
     meta: [
-      { title: "تتبّع الصيام — سكينة" },
-      { name: "description", content: "تتبّع صيامك في رمضان والأيام المسنونة مع إحصائياتك." },
+      { title: "صيام رمضان — سكينة" },
+      { name: "description", content: "تتبّع صيام شهر رمضان المبارك يومًا بيوم." },
     ],
   }),
   component: FastingPage,
@@ -15,33 +15,10 @@ export const Route = createFileRoute("/fasting")({
 
 const KEY = "sakeenah:fasting";
 
-const VOLUNTARY_DAYS = [
-  { id: "mon", label: "الاثنين",   desc: "صيام الاثنين — سنة نبوية", icon: "📅" },
-  { id: "thu", label: "الخميس",   desc: "صيام الخميس — سنة نبوية",  icon: "📅" },
-  { id: "ayam-bid-1", label: "١٣ من الشهر", desc: "الأيام البيض الثلاثة",   icon: "🌕" },
-  { id: "ayam-bid-2", label: "١٤ من الشهر", desc: "الأيام البيض الثلاثة",   icon: "🌕" },
-  { id: "ayam-bid-3", label: "١٥ من الشهر", desc: "الأيام البيض الثلاثة",   icon: "🌕" },
-  { id: "ashura",     label: "عاشوراء ١٠ محرم",  desc: "يكفّر سنة",   icon: "⭐" },
-  { id: "arafah",     label: "عرفة ٩ ذو الحجة", desc: "يكفّر سنتين", icon: "🌟" },
-  { id: "shawwal-1",  label: "ست من شوال ١", desc: "كصيام الدهر مع رمضان", icon: "💚" },
-  { id: "shawwal-2",  label: "ست من شوال ٢", desc: "", icon: "💚" },
-  { id: "shawwal-3",  label: "ست من شوال ٣", desc: "", icon: "💚" },
-  { id: "shawwal-4",  label: "ست من شوال ٤", desc: "", icon: "💚" },
-  { id: "shawwal-5",  label: "ست من شوال ٥", desc: "", icon: "💚" },
-  { id: "shawwal-6",  label: "ست من شوال ٦", desc: "", icon: "💚" },
-];
-
-type Mode = "ramadan" | "voluntary";
-
-function todayKey() { return new Date().toISOString().slice(0, 10); }
-
-function FastingPage() {
-  const [mode, setMode] = useState<Mode>("ramadan");
+export default function FastingPage() {
   const [fasted, setFasted] = useState<Record<string, boolean>>({});
   const [suhoor, setSuhoor] = useState<Record<string, boolean>>({});
-  const [intention, setIntention] = useState(false);
-  const [voluntaryDone, setVoluntaryDone] = useState<Set<string>>(new Set());
-  const [ramadanDays, setRamadanDays] = useState(30);
+  const [days, setDays] = useState(30);
 
   useEffect(() => {
     try {
@@ -50,166 +27,145 @@ function FastingPage() {
         const d = JSON.parse(raw);
         setFasted(d.fasted ?? {});
         setSuhoor(d.suhoor ?? {});
-        setVoluntaryDone(new Set(d.voluntaryDone ?? []));
-        setRamadanDays(d.ramadanDays ?? 30);
+        setDays(d.days ?? 30);
       }
     } catch {}
   }, []);
 
-  function persist(f: typeof fasted, s: typeof suhoor, v: Set<string>) {
-    localStorage.setItem(KEY, JSON.stringify({ fasted: f, suhoor: s, voluntaryDone: [...v], ramadanDays }));
+  function persist(f: typeof fasted, s: typeof suhoor, d: number) {
+    localStorage.setItem(KEY, JSON.stringify({ fasted: f, suhoor: s, days: d }));
   }
 
-  // Ramadan grid
-  const days = Array.from({ length: ramadanDays }, (_, i) => i + 1);
-  const fastedCount = Object.values(fasted).filter(Boolean).length;
-
-  function toggleDay(day: number) {
-    const key = `ramadan-${day}`;
+  function toggleFast(day: number) {
+    const key = `r${day}`;
     const newF = { ...fasted, [key]: !fasted[key] };
-    setFasted(newF); persist(newF, suhoor, voluntaryDone);
-    if (!fasted[key]) navigator.vibrate?.(18);
-    if (fastedCount + 1 === ramadanDays && !fasted[key]) {
-      toast.success("🎉 أتممت صيام الشهر كاملاً! تقبّل الله صيامك", { duration: 5000 });
+    setFasted(newF);
+    persist(newF, suhoor, days);
+    if (!fasted[key]) {
+      navigator.vibrate?.(15);
+      const done = Object.values(newF).filter(Boolean).length;
+      if (done === days) toast.success("🎉 أتممت صيام رمضان! تقبّل الله منك");
     }
   }
 
   function toggleSuhoor(day: number) {
-    const key = `suhoor-${day}`;
+    const key = `s${day}`;
     const newS = { ...suhoor, [key]: !suhoor[key] };
-    setSuhoor(newS); persist(fasted, newS, voluntaryDone);
+    setSuhoor(newS);
+    persist(fasted, newS, days);
   }
 
-  function toggleVoluntary(id: string) {
-    const next = new Set(voluntaryDone);
-    next.has(id) ? next.delete(id) : next.add(id);
-    setVoluntaryDone(next); persist(fasted, suhoor, next);
-    if (!voluntaryDone.has(id)) toast.success("بارك الله في صيامك ✨");
-  }
-
-  const todayNum = (() => {
-    // estimate — in a real app this would come from the Hijri calendar
-    return new Date().getDate() % ramadanDays || ramadanDays;
-  })();
+  const fastedCount = Array.from({ length: days }, (_, i) => fasted[`r${i + 1}`]).filter(Boolean).length;
+  const suhoorCount = Array.from({ length: days }, (_, i) => suhoor[`s${i + 1}`]).filter(Boolean).length;
+  const pct = Math.round((fastedCount / days) * 100);
 
   return (
-    <div className="fade-up pb-8">
+    <div className="fade-up pb-28">
       {/* Hero */}
-      <div className="relative overflow-hidden rounded-b-[2.5rem] gradient-hero text-primary-foreground pattern-islamic px-5 pt-8 pb-6 shadow-elevated mb-4">
-        <h1 className="font-quran heading-page">تتبّع الصيام</h1>
-        <p className="text-sm opacity-80 mt-1">رمضان والأيام المسنونة</p>
+      <div className="relative overflow-hidden rounded-b-[2rem] px-5 pt-8 pb-8 mb-4 shadow-elevated"
+        style={{ background: "var(--g-hero)" }}>
+        <h1 className="font-quran text-3xl text-white">صيام رمضان</h1>
+        <p className="text-xs text-white/60 mt-1">تتبّع صيامك يوماً بيوم في شهر رمضان المبارك</p>
+
         <div className="mt-4 grid grid-cols-3 gap-2 text-center">
           {[
-            { label: "أيام صُمتها", value: fastedCount },
-            { label: "متبقية", value: ramadanDays - fastedCount },
-            { label: "مع السحور", value: Object.values(suhoor).filter(Boolean).length },
+            { label: "صُمتها", value: fastedCount },
+            { label: "مع السحور", value: suhoorCount },
+            { label: "نسبة الإكمال", value: `${pct}%` },
           ].map(({ label, value }) => (
-            <div key={label} className="rounded-2xl bg-white/10 backdrop-blur py-2.5">
-              <p className="font-quran text-2xl">{value}</p>
-              <p className="text-[10px] opacity-75">{label}</p>
+            <div key={label} className="rounded-2xl py-2.5 px-2" style={{ background: "oklch(1 0 0 / 12%)" }}>
+              <p className="font-quran text-2xl text-white">{value}</p>
+              <p className="text-[10px] text-white/60">{label}</p>
             </div>
+          ))}
+        </div>
+
+        {/* Progress */}
+        <div className="mt-3 h-2 rounded-full overflow-hidden" style={{ background: "oklch(1 0 0 / 15%)" }}>
+          <div className="h-full rounded-full transition-all duration-500"
+            style={{ width: `${pct}%`, background: "var(--g-gold)" }} />
+        </div>
+      </div>
+
+      {/* Days count selector */}
+      <div className="flex items-center justify-between px-4 mb-4">
+        <p className="text-sm font-semibold text-foreground">أيام رمضان</p>
+        <div className="flex gap-2">
+          {[29, 30].map(d => (
+            <button key={d} onClick={() => { setDays(d); persist(fasted, suhoor, d); }}
+              className={`rounded-full px-3 py-1.5 text-xs font-bold transition ${
+                days === d
+                  ? "text-white"
+                  : "bg-card border border-border text-foreground"
+              }`}
+              style={days === d ? { background: "var(--g-primary)" } : {}}>
+              {d} يوم
+            </button>
           ))}
         </div>
       </div>
 
-      {/* Tabs */}
-      <div className="flex mx-4 gap-2 mb-4">
-        {([["ramadan","رمضان"],["voluntary","التطوع"]] as const).map(([k,l]) => (
-          <button key={k} onClick={() => setMode(k)}
-            className={`flex-1 rounded-2xl py-2.5 text-sm font-bold transition ${mode===k?"gradient-primary text-primary-foreground shadow-glow":"bg-card border border-border text-muted-foreground"}`}>
-            {l}
-          </button>
-        ))}
-      </div>
-
-      {/* RAMADAN MODE */}
-      {mode === "ramadan" && (
-        <div className="px-4">
-          <div className="flex items-center justify-between mb-3">
-            <p className="text-sm font-semibold">شبكة الصيام</p>
-            <div className="flex items-center gap-2 text-xs text-muted-foreground">
-              <span>عدد الأيام:</span>
-              <select value={ramadanDays} onChange={e => setRamadanDays(Number(e.target.value))}
-                className="bg-card border border-border rounded-lg px-2 py-1 text-xs outline-none">
-                <option value={29}>٢٩</option>
-                <option value={30}>٣٠</option>
-              </select>
-            </div>
-          </div>
-
-          {/* Progress bar */}
-          <div className="h-2 rounded-full bg-muted mb-4 overflow-hidden">
-            <div className="h-full gradient-gold transition-all duration-500"
-              style={{ width: `${(fastedCount / ramadanDays) * 100}%` }}/>
-          </div>
-
-          <div className="grid grid-cols-5 sm:grid-cols-7 gap-2">
-            {days.map(day => {
-              const fKey = `ramadan-${day}`;
-              const sKey = `suhoor-${day}`;
-              const done = !!fasted[fKey];
-              const hasSuhoor = !!suhoor[sKey];
-              const isToday = day === todayNum;
-              return (
-                <div key={day} className={`rounded-2xl overflow-hidden border transition ${
-                  done ? "border-primary/30" : isToday ? "border-2 border-primary" : "border-border/40"
-                }`}>
-                  <button onClick={() => toggleDay(day)}
-                    className={`w-full py-2.5 text-center transition active:scale-90 ${
-                      done ? "gradient-primary text-primary-foreground" : "bg-card"
-                    }`}>
-                    <span className="font-quran text-base font-bold">{day}</span>
-                    {done && <div className="text-[8px] mt-0.5 opacity-80">✓</div>}
-                  </button>
-                  <button onClick={() => toggleSuhoor(day)}
-                    title="سحور"
-                    className={`w-full py-1 text-center text-[10px] transition border-t ${
-                      hasSuhoor ? "bg-gold/20 text-gold border-gold/20" : "bg-muted/30 text-muted-foreground border-border/30"
-                    }`}>
-                    {hasSuhoor ? "🌙" : "—"}
-                  </button>
-                </div>
-              );
-            })}
-          </div>
-
-          <div className="mt-3 flex gap-4 text-[10px] text-muted-foreground">
-            <span className="flex gap-1 items-center"><span className="h-3 w-3 rounded gradient-primary inline-block"/>صام</span>
-            <span className="flex gap-1 items-center"><span className="h-3 w-3 rounded bg-gold/30 inline-block"/>مع سحور</span>
-          </div>
-
-          {fastedCount === ramadanDays && (
-            <div className="mt-4 rounded-3xl gradient-gold text-gold-foreground p-5 text-center shadow-gold">
-              <Trophy className="h-10 w-10 mx-auto mb-2"/>
-              <p className="font-quran text-2xl">تقبّل الله صيامك!</p>
-              <p className="text-sm opacity-80 mt-1">اللهم تقبّل منا صيامنا وقيامنا</p>
-            </div>
-          )}
+      {/* Completion trophy */}
+      {fastedCount === days && (
+        <div className="mx-4 mb-4 rounded-3xl p-5 text-center text-white"
+          style={{ background: "var(--g-gold)" }}>
+          <Trophy className="h-10 w-10 mx-auto mb-2 text-amber-900" />
+          <p className="font-quran text-2xl text-amber-900">تقبّل الله صيامك!</p>
+          <p className="text-sm text-amber-800/80 mt-1">اللهم تقبّل منا صيامنا وقيامنا</p>
         </div>
       )}
 
-      {/* VOLUNTARY MODE */}
-      {mode === "voluntary" && (
-        <div className="px-4 space-y-2">
-          <div className="rounded-2xl bg-gold/10 border border-gold/20 p-4 mb-3">
-            <p className="text-sm font-quran">«الصِّيَامُ جُنَّةٌ» — رواه البخاري ومسلم</p>
+      {/* Days Grid */}
+      <div className="px-4">
+        <div className="flex items-center justify-between mb-2">
+          <p className="text-xs text-muted-foreground">اضغط على اليوم لتسجيل الصيام</p>
+          <div className="flex gap-3 text-[10px] text-muted-foreground">
+            <span className="flex items-center gap-1"><span className="h-2 w-2 rounded" style={{ background: "var(--g-primary)" }} /> صام</span>
+            <span className="flex items-center gap-1"><span className="h-2 w-2 rounded bg-amber-400/50" /> مع سحور</span>
           </div>
-          {VOLUNTARY_DAYS.map(d => {
-            const done = voluntaryDone.has(d.id);
+        </div>
+
+        <div className="grid grid-cols-5 sm:grid-cols-7 gap-2">
+          {Array.from({ length: days }, (_, i) => {
+            const day = i + 1;
+            const hasFasted = !!fasted[`r${day}`];
+            const hasSuhoor = !!suhoor[`s${day}`];
             return (
-              <button key={d.id} onClick={() => toggleVoluntary(d.id)}
-                className={`w-full flex items-center gap-4 rounded-3xl p-4 border shadow-soft transition active:scale-[0.98] text-right ${done ? "gradient-primary text-primary-foreground border-transparent" : "bg-card border-border/60"}`}>
-                <span className="text-2xl">{d.icon}</span>
-                <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-sm">{d.label}</p>
-                  {d.desc && <p className={`text-[11px] mt-0.5 ${done ? "opacity-80" : "text-muted-foreground"}`}>{d.desc}</p>}
-                </div>
-                {done ? <CheckCircle2 className="h-6 w-6 shrink-0"/> : <Circle className="h-6 w-6 shrink-0 opacity-40"/>}
-              </button>
+              <div key={day} className={`rounded-2xl overflow-hidden border transition ${
+                hasFasted ? "border-primary/30" : "border-border/40"
+              }`}>
+                <button
+                  onClick={() => toggleFast(day)}
+                  className={`w-full py-3 text-center text-sm font-bold transition active:scale-90 ${
+                    hasFasted ? "text-white" : "bg-card text-foreground"
+                  }`}
+                  style={hasFasted ? { background: "var(--g-primary)" } : {}}>
+                  <span className="font-quran text-base">{day}</span>
+                  {hasFasted && <div className="text-[8px] mt-0.5 opacity-80">✓</div>}
+                </button>
+                <button
+                  onClick={() => toggleSuhoor(day)}
+                  title="سحور"
+                  className={`w-full py-1 text-[10px] text-center border-t transition ${
+                    hasSuhoor
+                      ? "bg-amber-400/20 text-amber-600 dark:text-amber-400 border-amber-400/20"
+                      : "bg-muted/20 text-muted-foreground border-border/30"
+                  }`}>
+                  {hasSuhoor ? <Moon className="h-2.5 w-2.5 mx-auto" /> : <Sun className="h-2.5 w-2.5 mx-auto opacity-30" />}
+                </button>
+              </div>
             );
           })}
         </div>
-      )}
+      </div>
+
+      {/* Hadith about fasting */}
+      <div className="mx-4 mt-6 rounded-3xl p-5 border border-border/60 bg-card shadow-soft">
+        <p className="font-quran text-xl text-foreground leading-loose" dir="rtl">
+          «الصِّيَامُ جُنَّةٌ، فَإِذَا كَانَ يَوْمُ صَوْمِ أَحَدِكُمْ فَلَا يَرْفُثْ وَلَا يَصْخَبْ»
+        </p>
+        <p className="text-xs text-muted-foreground mt-2">متفق عليه</p>
+      </div>
     </div>
   );
 }

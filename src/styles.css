@@ -1037,3 +1037,222 @@ mark.quran-mark {
   .gradient-primary, .gradient-gold { background: ButtonFace; color: ButtonText; }
   .shadow-glow, .shadow-gold, .shadow-elevated { box-shadow: none; }
 }
+
+/* ═══════════════════════════════════════════════════════════════════
+   DARK MODE CRITICAL FIXES — v3
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* Force text to be visible in dark mode */
+.dark body,
+.dark * {
+  --tw-text-opacity: 1;
+}
+
+/* Fix: any text inside cards must be foreground, not transparent */
+.dark .bg-card,
+.dark [class*="bg-card"] {
+  color: var(--foreground);
+}
+
+/* Fix input/select in dark mode */
+.dark input,
+.dark textarea,
+.dark select {
+  background-color: var(--card);
+  color: var(--foreground);
+  border-color: var(--border);
+}
+
+.dark input::placeholder,
+.dark textarea::placeholder {
+  color: var(--muted-foreground);
+}
+
+/* Fix text inside gradient backgrounds */
+.dark [class*="gradient-hero"] *,
+.dark [class*="gradient-primary"] * {
+  color: inherit;
+}
+
+/* Prevent shimmer layout shift */
+.shimmer {
+  border-radius: var(--radius-lg);
+  display: block;
+}
+
+/* ── Fix: pixel rendering on all screens ── */
+* {
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  -webkit-text-size-adjust: 100%;
+}
+
+/* Fix: font rendering on mobile */
+.font-quran {
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  will-change: auto;
+}
+
+/* ── Fix: bottom nav text visibility ── */
+nav .text-foreground { color: var(--foreground) !important; }
+nav .text-muted-foreground { color: var(--muted-foreground) !important; }
+
+/* ── Animation: use GPU layers only for animated elements ── */
+.animate-spin,
+.animate-pulse,
+.wave-bar {
+  will-change: transform;
+}
+
+/* Disable heavy animations on low-power devices */
+@media (prefers-reduced-motion: reduce) {
+  .animate-spin,
+  .animate-pulse,
+  .wave-bar,
+  .fade-up {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* ── Fix: page transitions cause layout shift ── */
+.fade-up {
+  animation: fadeUp 0.22s ease-out both;
+}
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Fix: MiniPlayer overlaps content on mobile ── */
+.mini-player-spacer { height: 5rem; }
+@media (min-width: 768px) { .mini-player-spacer { height: 0; } }
+
+/* ── Fix: Active scale for touch — prevent layout shift ── */
+.active\:scale-\[0\.97\]:active,
+.active\:scale-\[0\.98\]:active,
+.active\:scale-\[0\.99\]:active {
+  transform-origin: center;
+}
+
+/* ── Fix: card border in dark mode ── */
+.dark .border-border\/60,
+.dark .border-border\/40 {
+  border-color: oklch(1 0 0 / 10%);
+}
+
+/* ── Select arrow fix for dark mode ── */
+.dark select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23aaa' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: left 0.75rem center;
+  padding-left: 2rem;
+}
+
+/* ── Fix sticky headers in dark mode ── */
+.dark [class*="backdrop-blur"] {
+  background: color-mix(in oklab, var(--background) 88%, transparent) !important;
+}
+
+/* ── Radio wave bars dark mode ── */
+.dark .wave-bar { background: currentColor; }
+
+/* ── Quran ayah numbers ── */
+.ayah-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  background: var(--g-gold);
+  color: oklch(0.25 0.08 80);
+  font-family: var(--font-arabic);
+  font-size: 0.75rem;
+  font-weight: 700;
+  margin: 0 0.25rem;
+  flex-shrink: 0;
+}
+
+/* ── Improved scrollbar ── */
+::-webkit-scrollbar { width: 3px; height: 3px; }
+::-webkit-scrollbar-thumb {
+  background: oklch(0.55 0.06 165 / 0.3);
+  border-radius: 9999px;
+}
+.dark ::-webkit-scrollbar-thumb {
+  background: oklch(0.45 0.05 165 / 0.4);
+}
+
+/* ── Notification dot ── */
+.notif-dot {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: oklch(0.72 0.20 140);
+  border: 2px solid var(--background);
+}
+
+/* ── Toast dark mode ── */
+.dark [data-sonner-toast] {
+  background: var(--card) !important;
+  color: var(--foreground) !important;
+  border-color: var(--border) !important;
+}
+
+/* ── Glass bottom nav ── */
+.glass-nav {
+  background: color-mix(in oklab, var(--background) 80%, transparent);
+  backdrop-filter: blur(20px) saturate(1.8);
+  -webkit-backdrop-filter: blur(20px) saturate(1.8);
+  border-top: 1px solid var(--border);
+}
+
+/* ── Full screen AI chat ── */
+.ai-fullscreen {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: var(--background);
+  display: flex;
+  flex-direction: column;
+}
+@media (min-width: 768px) {
+  .ai-fullscreen {
+    position: relative;
+    inset: auto;
+    z-index: auto;
+    min-height: calc(100dvh - 4rem);
+  }
+}
+
+/* ── Typing indicator ── */
+.typing-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--primary);
+  animation: typingBounce 1.2s ease-in-out infinite;
+}
+.typing-dot:nth-child(2) { animation-delay: 0.2s; }
+.typing-dot:nth-child(3) { animation-delay: 0.4s; }
+@keyframes typingBounce {
+  0%, 60%, 100% { transform: translateY(0); }
+  30%           { transform: translateY(-6px); }
+}
+
+/* ── Profile avatar ring ── */
+.avatar-ring {
+  box-shadow: 0 0 0 3px var(--primary), 0 0 0 5px var(--background);
+}
+
+/* ── Responsive utility fixes ── */
+@media (max-width: 360px) {
+  .font-quran { font-size: 1.4rem; }
+  nav span[class*="text-["] { font-size: 9px !important; }
+}

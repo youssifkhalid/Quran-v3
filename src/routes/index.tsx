@@ -211,7 +211,6 @@ function Home() {
             { to: "/names",    icon: Star,           label: "الأسماء" },
             { to: "/radio",    icon: Radio,         label: "إذاعة القرآن"   },
             { to: "/reciters", icon: Mic2,          label: "الشيوخ"         },
-            { to: "/rakaat",   icon: Calculator,    label: "الركعات"        },
             { to: "/search",   icon: Search,        label: "بحث شامل"       },
           ].map(({ to, icon: Icon, label }) => (
             <Link key={to} to={to as any}

@@ -2,7 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState, useRef, useEffect, useCallback } from "react";
 import {
   Send, Sparkles, RotateCcw, BookOpen, Loader2, Copy, Share2,
-  ChevronDown, AlertCircle, Lightbulb, Star
+  ChevronDown, AlertCircle, Lightbulb, Mic2, Volume2,
+  BookMarked, Star, Moon, X
 } from "lucide-react";
 import { askIslamicAI, SUGGESTED_QUESTIONS, type AIChatMessage, type AIResponse } from "@/lib/ai-islamic";
 import { toast } from "sonner";
@@ -30,15 +31,9 @@ interface ConvMessage {
 type SourceType = "quran" | "hadith" | "scholar";
 
 const SOURCE_COLORS: Record<SourceType, { bg: string; text: string; border: string; icon: string }> = {
-  quran:   { bg: "bg-emerald-500/10", text: "text-emerald-700 dark:text-emerald-300", border: "border-emerald-500/30", icon: "📖" },
-  hadith:  { bg: "bg-amber-500/10",   text: "text-amber-700 dark:text-amber-300",     border: "border-amber-500/30",   icon: "📚" },
-  scholar: { bg: "bg-blue-500/10",    text: "text-blue-700 dark:text-blue-300",       border: "border-blue-500/30",    icon: "🎓" },
-};
-
-const SOURCE_LABELS: Record<SourceType, string> = {
-  quran: "قرآن كريم",
-  hadith: "حديث شريف",
-  scholar: "قول عالم",
+  quran:   { bg: "bg-emerald-500/10", text: "text-emerald-700 dark:text-emerald-300", border: "border-emerald-500/20", icon: "📖" },
+  hadith:  { bg: "bg-amber-500/10",   text: "text-amber-700 dark:text-amber-300",     border: "border-amber-500/20",   icon: "📚" },
+  scholar: { bg: "bg-blue-500/10",    text: "text-blue-700 dark:text-blue-300",       border: "border-blue-500/20",    icon: "🎓" },
 };
 
 function AIChatPage() {
@@ -62,16 +57,17 @@ function AIChatPage() {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, loading]);
 
-  const saveHistory = useCallback((msgs: ConvMessage[]) => {
+  function saveHistory(msgs: ConvMessage[]) {
     try {
-      localStorage.setItem(HISTORY_KEY, JSON.stringify(msgs.slice(-40)));
+      // Keep last 50 messages
+      const trimmed = msgs.slice(-50);
+      localStorage.setItem(HISTORY_KEY, JSON.stringify(trimmed));
     } catch {}
-  }, []);
+  }
 
-  async function send(text?: string) {
+  const handleSend = useCallback(async (text?: string) => {
     const q = (text ?? input).trim();
     if (!q || loading) return;
-    setInput("");
 
     const userMsg: ConvMessage = {
       id: crypto.randomUUID(),
@@ -80,143 +76,129 @@ function AIChatPage() {
       timestamp: Date.now(),
     };
 
-    const updatedMsgs = [...messages, userMsg];
-    setMessages(updatedMsgs);
+    const newMessages = [...messages, userMsg];
+    setMessages(newMessages);
+    setInput("");
     setLoading(true);
-
-    // Build history for API (last 10 messages)
-    const apiHistory: AIChatMessage[] = updatedMsgs.slice(-10).map((m) => ({
-      role: m.role,
-      content: m.role === "assistant" ? (m.response?.answer ?? m.content) : m.content,
-    }));
+    saveHistory(newMessages);
 
     try {
-      const response = await askIslamicAI({ data: { messages: apiHistory } });
+      const history: AIChatMessage[] = newMessages.map((m) => ({
+        role: m.role,
+        content: m.content,
+      }));
+
+      const result = await askIslamicAI({ data: { messages: history } });
 
       const assistantMsg: ConvMessage = {
         id: crypto.randomUUID(),
         role: "assistant",
-        content: response.answer,
-        response,
+        content: result.answer,
+        response: result,
         timestamp: Date.now(),
       };
 
-      const finalMsgs = [...updatedMsgs, assistantMsg];
-      setMessages(finalMsgs);
-      saveHistory(finalMsgs);
+      const finalMessages = [...newMessages, assistantMsg];
+      setMessages(finalMessages);
+      saveHistory(finalMessages);
     } catch (e) {
-      const errMsg: ConvMessage = {
+      const errorMsg: ConvMessage = {
         id: crypto.randomUUID(),
         role: "assistant",
-        content: "تعذّر الاتصال بالخادم. تحقق من الاتصال وحاول مرة أخرى.",
-        response: { answer: "", sources: [], error: "network" },
+        content: "عذرًا، حدث خطأ في الاتصال. يرجى المحاولة مرة أخرى.",
         timestamp: Date.now(),
       };
-      const finalMsgs = [...updatedMsgs, errMsg];
-      setMessages(finalMsgs);
+      const finalMessages = [...newMessages, errorMsg];
+      setMessages(finalMessages);
+      saveHistory(finalMessages);
     } finally {
       setLoading(false);
-      inputRef.current?.focus();
+      setTimeout(() => inputRef.current?.focus(), 100);
     }
+  }, [input, loading, messages]);
+
+  function clearHistory() {
+    setMessages([]);
+    localStorage.removeItem(HISTORY_KEY);
+    toast.success("تم مسح المحادثة");
+  }
+
+  function copyMsg(text: string) {
+    navigator.clipboard?.writeText(text).catch(() => {});
+    toast.success("تم النسخ");
+  }
+
+  function shareMsg(text: string) {
+    const shareText = `${text}\n\n— سكينة AI، المساعد الإسلامي`;
+    if (navigator.share) navigator.share({ text: shareText }).catch(() => {});
+    else { navigator.clipboard?.writeText(shareText).catch(() => {}); toast.success("تم النسخ"); }
   }
 
   function toggleSources(id: string) {
-    setExpandedSources((prev) => {
+    setExpandedSources(prev => {
       const next = new Set(prev);
       next.has(id) ? next.delete(id) : next.add(id);
       return next;
     });
   }
 
-  function copyAnswer(text: string) {
-    navigator.clipboard?.writeText(text).catch(() => {});
-    toast.success("تم نسخ الإجابة");
+  function handleKey(e: React.KeyboardEvent) {
+    if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSend(); }
   }
 
-  function shareAnswer(msg: ConvMessage) {
-    const text = `سؤال: ${messages.find((m, i, arr) => arr[i + 1]?.id === msg.id)?.content ?? ""}\n\nالإجابة: ${msg.content}\n\n— سكينة AI، تطبيقك الإسلامي`;
-    if (navigator.share) navigator.share({ text }).catch(() => {});
-    else copyAnswer(text);
-  }
-
-  function clearHistory() {
-    if (!confirm("حذف كامل المحادثة؟")) return;
-    setMessages([]);
-    localStorage.removeItem(HISTORY_KEY);
-  }
-
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      send();
-    }
-  };
+  const isEmpty = messages.length === 0;
 
   return (
-    <div className="flex flex-col min-h-[calc(100dvh-5rem)]">
-      {/* Header */}
-      <header className="sticky top-0 z-30 glass border-b border-border/40">
-        <div className="px-4 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="relative">
-              <div className="grid h-10 w-10 place-items-center rounded-2xl gradient-primary text-primary-foreground shadow-glow">
-                <Sparkles className="h-5 w-5" />
-              </div>
-              <span className="absolute -top-1 -right-1 h-3 w-3 rounded-full bg-emerald-400 border-2 border-background animate-pulse" />
-            </div>
-            <div>
-              <h1 className="font-bold text-sm leading-none">سكينة AI</h1>
-              <p className="text-[10px] text-emerald-600 dark:text-emerald-400 mt-0.5">يجيب من مصادر إسلامية موثوقة</p>
-            </div>
+    <div className="ai-fullscreen fade-up">
+      {/* Fixed Header */}
+      <header className="shrink-0 flex items-center justify-between px-4 py-3 border-b border-border/40"
+        style={{ background: "color-mix(in oklab, var(--background) 90%, transparent)", backdropFilter: "blur(20px)" }}>
+        <div className="flex items-center gap-3">
+          <div className="grid h-9 w-9 place-items-center rounded-2xl shadow-soft"
+            style={{ background: "var(--g-primary)" }}>
+            <Sparkles className="h-4 w-4 text-white" />
           </div>
-          {messages.length > 0 && (
-            <button onClick={clearHistory} className="flex items-center gap-1 text-xs text-muted-foreground hover:text-destructive transition rounded-full px-3 py-1.5 hover:bg-destructive/10">
-              <RotateCcw className="h-3.5 w-3.5" />
-              مسح
-            </button>
-          )}
+          <div>
+            <p className="text-sm font-bold text-foreground">المساعد الإسلامي AI</p>
+            <p className="text-[10px] text-emerald-500 flex items-center gap-1">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse inline-block" />
+              Gemini • مع المصادر الشرعية
+            </p>
+          </div>
         </div>
-
-        {/* Disclaimer */}
-        <div className="mx-4 mb-2 rounded-xl bg-amber-500/10 border border-amber-500/20 px-3 py-2 flex items-start gap-2">
-          <AlertCircle className="h-3.5 w-3.5 text-amber-600 dark:text-amber-400 mt-0.5 shrink-0" />
-          <p className="text-[10px] text-amber-700 dark:text-amber-300 leading-relaxed">
-            الإجابات للاستئناس العلمي فقط. في المسائل الجسيمة استشر عالمًا متخصصًا.
-          </p>
-        </div>
+        {messages.length > 0 && (
+          <button onClick={clearHistory}
+            className="grid h-8 w-8 place-items-center rounded-full bg-muted text-muted-foreground hover:text-destructive transition">
+            <RotateCcw className="h-3.5 w-3.5" />
+          </button>
+        )}
       </header>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto px-3 py-4 space-y-4">
-
+      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
         {/* Welcome state */}
-        {messages.length === 0 && (
-          <div className="fade-up text-center py-6">
-            <div className="relative inline-flex">
-              <div className="grid h-20 w-20 place-items-center rounded-3xl gradient-primary text-primary-foreground shadow-elevated mx-auto">
-                <Sparkles className="h-9 w-9" />
-              </div>
-              <div className="absolute -inset-2 rounded-3xl gradient-primary opacity-20 blur-xl -z-10" />
+        {isEmpty && (
+          <div className="flex flex-col items-center pt-8 pb-4 fade-up">
+            <div className="grid h-20 w-20 place-items-center rounded-3xl mb-5 shadow-elevated"
+              style={{ background: "var(--g-primary)" }}>
+              <Sparkles className="h-10 w-10 text-white" />
             </div>
-            <h2 className="font-quran text-2xl mt-4">المساعد الإسلامي</h2>
-            <p className="text-sm text-muted-foreground mt-2 max-w-xs mx-auto leading-relaxed">
-              اسأل عن الفقه والحديث والتفسير والعقيدة — سأجيبك بأدلة من المصادر الشرعية الموثوقة
+            <h2 className="font-quran text-2xl text-foreground">سكينة AI</h2>
+            <p className="text-sm text-muted-foreground mt-2 text-center max-w-xs">
+              اسأل عن الفقه والحديث والتفسير وأحكام الإسلام
             </p>
 
-            <div className="mt-6">
-              <p className="text-xs text-muted-foreground mb-3 flex items-center justify-center gap-1">
-                <Lightbulb className="h-3.5 w-3.5" />
-                أسئلة مقترحة
+            {/* Suggested questions */}
+            <div className="mt-6 w-full max-w-lg">
+              <p className="text-xs font-semibold text-muted-foreground mb-3 flex items-center gap-2">
+                <Lightbulb className="h-3.5 w-3.5 text-amber-500" /> أسئلة مقترحة
               </p>
-              <div className="grid grid-cols-2 gap-2">
-                {SUGGESTED_QUESTIONS.map((q, i) => (
-                  <button
-                    key={i}
-                    onClick={() => send(q.text)}
-                    className="text-right rounded-2xl bg-card border border-border/60 px-3 py-3 text-xs leading-relaxed shadow-soft hover:border-primary/30 hover:bg-primary/5 transition active:scale-95"
-                  >
-                    <span className="text-base">{q.emoji}</span>
-                    <p className="mt-1">{q.text}</p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {SUGGESTED_QUESTIONS.map(({ emoji, text }) => (
+                  <button key={text} onClick={() => handleSend(text)}
+                    className="flex items-center gap-2.5 rounded-2xl bg-card border border-border/60 p-3 text-right text-sm text-foreground shadow-soft hover:border-primary/30 active:scale-[0.97] transition">
+                    <span className="text-lg shrink-0">{emoji}</span>
+                    <span className="text-xs leading-relaxed">{text}</span>
                   </button>
                 ))}
               </div>
@@ -224,129 +206,104 @@ function AIChatPage() {
           </div>
         )}
 
-        {/* Messages list */}
-        {messages.map((msg, idx) => {
-          const isUser = msg.role === "user";
-          const resp = msg.response;
-          const sourcesExpanded = expandedSources.has(msg.id);
-
-          return (
-            <div key={msg.id} className={`fade-up flex ${isUser ? "justify-start" : "justify-end"} items-end gap-2`}>
-              {/* User bubble */}
-              {isUser && (
-                <div className="max-w-[82%]">
-                  <div className="rounded-3xl rounded-br-md bg-card border border-border/60 px-4 py-3 shadow-soft">
-                    <p className="text-sm leading-relaxed">{msg.content}</p>
-                  </div>
-                  <p className="text-[10px] text-muted-foreground mt-1 px-1">
-                    {new Date(msg.timestamp).toLocaleTimeString("ar", { hour: "2-digit", minute: "2-digit" })}
-                  </p>
+        {/* Messages */}
+        {messages.map((msg) => (
+          <div key={msg.id} className={`flex ${msg.role === "user" ? "justify-start" : "justify-end"}`}>
+            <div className={`max-w-[85%] ${msg.role === "user" ? "mr-auto" : "ml-auto"}`}>
+              {msg.role === "user" ? (
+                <div className="rounded-3xl rounded-tr-lg px-4 py-3 text-white shadow-soft"
+                  style={{ background: "var(--g-primary)" }}>
+                  <p className="text-sm leading-relaxed">{msg.content}</p>
                 </div>
-              )}
+              ) : (
+                <div className="rounded-3xl rounded-tl-lg bg-card border border-border/60 shadow-soft overflow-hidden">
+                  {/* Answer text */}
+                  <div className="px-4 pt-4 pb-2">
+                    <p className="text-sm leading-relaxed text-foreground">{msg.content}</p>
 
-              {/* AI bubble */}
-              {!isUser && (
-                <div className="max-w-[90%] w-full">
-                  <div className="rounded-3xl rounded-bl-md gradient-primary text-primary-foreground shadow-elevated p-4">
-                    {/* Answer text */}
-                    <p className="text-sm leading-[1.9] font-medium">{resp?.answer ?? msg.content}</p>
-
-                    {/* Summary pill */}
-                    {resp?.summary && (
-                      <div className="mt-3 rounded-xl bg-gold/20 border border-gold/30 px-3 py-2">
-                        <p className="text-xs font-bold text-gold-foreground">
-                          🔑 {resp.summary}
-                        </p>
-                      </div>
+                    {/* Summary */}
+                    {msg.response?.summary && (
+                      <p className="mt-2 text-xs text-primary font-semibold border-t border-border/30 pt-2">
+                        📋 {msg.response.summary}
+                      </p>
                     )}
 
                     {/* Madhahib */}
-                    {resp?.madhahib && (
-                      <div className="mt-2 rounded-xl bg-white/10 px-3 py-2">
-                        <p className="text-[11px] opacity-90">⚖️ {resp.madhahib}</p>
+                    {msg.response?.madhahib && (
+                      <div className="mt-2 rounded-xl px-3 py-2 bg-muted/50 text-xs text-muted-foreground">
+                        ⚖️ {msg.response.madhahib}
                       </div>
                     )}
-
-                    {/* Sources toggle */}
-                    {resp?.sources && resp.sources.length > 0 && (
-                      <button
-                        onClick={() => toggleSources(msg.id)}
-                        className="mt-3 flex items-center gap-2 text-[11px] bg-white/15 hover:bg-white/20 rounded-full px-3 py-1.5 transition"
-                      >
-                        <BookOpen className="h-3.5 w-3.5" />
-                        {resp.sources.length} مصدر شرعي
-                        <ChevronDown className={`h-3.5 w-3.5 transition-transform ${sourcesExpanded ? "rotate-180" : ""}`} />
-                      </button>
-                    )}
-
-                    {/* Actions */}
-                    <div className="mt-3 flex items-center gap-2 border-t border-white/20 pt-2">
-                      <button onClick={() => copyAnswer(resp?.answer ?? msg.content)}
-                        className="flex items-center gap-1 text-[10px] opacity-75 hover:opacity-100 transition">
-                        <Copy className="h-3 w-3" /> نسخ
-                      </button>
-                      <button onClick={() => shareAnswer(msg)}
-                        className="flex items-center gap-1 text-[10px] opacity-75 hover:opacity-100 transition">
-                        <Share2 className="h-3 w-3" /> مشاركة
-                      </button>
-                      <span className="ml-auto text-[10px] opacity-60">
-                        {new Date(msg.timestamp).toLocaleTimeString("ar", { hour: "2-digit", minute: "2-digit" })}
-                      </span>
-                    </div>
                   </div>
 
-                  {/* Sources expanded panel */}
-                  {sourcesExpanded && resp?.sources && resp.sources.length > 0 && (
-                    <div className="mt-2 space-y-2 fade-up">
-                      {resp.sources.map((src, si) => {
-                        const colors = SOURCE_COLORS[src.type] ?? SOURCE_COLORS.scholar;
-                        return (
-                          <div key={si}
-                            className={`rounded-2xl border ${colors.border} ${colors.bg} p-3`}>
-                            <div className="flex items-center gap-2 mb-1.5">
-                              <span className="text-sm">{colors.icon}</span>
-                              <span className={`text-[10px] font-bold ${colors.text}`}>
-                                {SOURCE_LABELS[src.type]}
-                              </span>
-                              {src.grade && (
-                                <span className={`text-[9px] ${colors.text} bg-white/30 px-1.5 rounded-full`}>
-                                  {src.grade}
-                                </span>
-                              )}
-                            </div>
-                            {src.text && (
-                              <p className="font-quran text-base leading-loose text-foreground mb-1">
-                                {src.text}
-                              </p>
-                            )}
-                            <p className={`text-[10px] ${colors.text} font-semibold`}>{src.ref}</p>
-                          </div>
-                        );
-                      })}
-                    </div>
+                  {/* Sources */}
+                  {msg.response?.sources && msg.response.sources.length > 0 && (
+                    <>
+                      <button
+                        onClick={() => toggleSources(msg.id)}
+                        className="w-full flex items-center justify-between px-4 py-2.5 border-t border-border/30 text-xs text-muted-foreground hover:bg-muted/30 transition">
+                        <span className="flex items-center gap-1.5">
+                          <BookMarked className="h-3 w-3 text-primary" />
+                          {msg.response.sources.length} مصادر شرعية
+                        </span>
+                        <ChevronDown className={`h-3.5 w-3.5 transition-transform ${expandedSources.has(msg.id) ? "rotate-180" : ""}`} />
+                      </button>
+
+                      {expandedSources.has(msg.id) && (
+                        <div className="px-3 pb-3 space-y-2 fade-up">
+                          {msg.response.sources.map((src, i) => {
+                            const colors = SOURCE_COLORS[src.type] ?? SOURCE_COLORS.scholar;
+                            return (
+                              <div key={i} className={`rounded-2xl p-3 border ${colors.bg} ${colors.border}`}>
+                                <div className="flex items-start gap-2">
+                                  <span className="text-base shrink-0">{colors.icon}</span>
+                                  <div className="flex-1 min-w-0">
+                                    <p className={`text-xs font-semibold ${colors.text}`}>
+                                      {src.ref}
+                                      {src.grade && <span className="mr-1 opacity-75">({src.grade})</span>}
+                                    </p>
+                                    <p className="text-xs text-foreground mt-1 leading-relaxed font-quran" dir="rtl">
+                                      {src.text}
+                                    </p>
+                                  </div>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </>
                   )}
+
+                  {/* Actions */}
+                  <div className="flex items-center gap-2 px-3 pb-3 pt-1 border-t border-border/20">
+                    <button onClick={() => copyMsg(msg.content)}
+                      className="flex items-center gap-1 text-[10px] text-muted-foreground hover:text-primary transition">
+                      <Copy className="h-3 w-3" /> نسخ
+                    </button>
+                    <button onClick={() => shareMsg(msg.content)}
+                      className="flex items-center gap-1 text-[10px] text-muted-foreground hover:text-primary transition">
+                      <Share2 className="h-3 w-3" /> مشاركة
+                    </button>
+                    <span className="mr-auto text-[9px] text-muted-foreground/60">
+                      {new Date(msg.timestamp).toLocaleTimeString("ar", { hour: "2-digit", minute: "2-digit" })}
+                    </span>
+                  </div>
                 </div>
               )}
             </div>
-          );
-        })}
+          </div>
+        ))}
 
         {/* Loading indicator */}
         {loading && (
-          <div className="flex justify-end fade-up">
-            <div className="rounded-3xl rounded-bl-md gradient-primary text-primary-foreground p-4 shadow-elevated">
-              <div className="flex items-center gap-3">
-                <Loader2 className="h-4 w-4 animate-spin" />
-                <span className="text-sm">يبحث في المصادر الشرعية…</span>
-              </div>
-              <div className="mt-2 flex gap-1.5">
-                {["القرآن", "الحديث", "الفقه"].map((s, i) => (
-                  <span key={i}
-                    className="text-[10px] bg-white/20 rounded-full px-2 py-0.5 animate-pulse"
-                    style={{ animationDelay: `${i * 200}ms` }}>
-                    {s}
-                  </span>
-                ))}
+          <div className="flex justify-end">
+            <div className="rounded-3xl rounded-tl-lg bg-card border border-border/60 px-5 py-4 shadow-soft">
+              <div className="flex items-center gap-1.5">
+                <span className="typing-dot" />
+                <span className="typing-dot" />
+                <span className="typing-dot" />
+                <span className="text-xs text-muted-foreground mr-2">يفكر…</span>
               </div>
             </div>
           </div>
@@ -356,51 +313,45 @@ function AIChatPage() {
       </div>
 
       {/* Input area */}
-      <div className="sticky bottom-[5.5rem] z-30 px-3 py-2">
-        <div className="rounded-3xl glass shadow-elevated border border-border/50 overflow-hidden">
-          {/* Quick reply chips */}
-          {messages.length > 0 && !loading && (
-            <div className="flex gap-2 px-3 pt-2 pb-1 overflow-x-auto hide-scrollbar">
-              {["وضّح أكثر", "اذكر آراء العلماء", "ما الدليل؟", "هل هناك خلاف؟"].map((chip) => (
-                <button
-                  key={chip}
-                  onClick={() => { setInput(chip); inputRef.current?.focus(); }}
-                  className="shrink-0 text-[11px] bg-primary/10 text-primary rounded-full px-3 py-1 hover:bg-primary/20 transition"
-                >
-                  {chip}
-                </button>
-              ))}
-            </div>
-          )}
+      <div className="shrink-0 border-t border-border/40 px-4 py-3"
+        style={{ background: "color-mix(in oklab, var(--background) 90%, transparent)", backdropFilter: "blur(20px)" }}>
+        {/* Quick suggest while typing */}
+        {!isEmpty && input.length === 0 && (
+          <div className="flex gap-2 overflow-x-auto pb-2 hide-scrollbar">
+            {SUGGESTED_QUESTIONS.slice(0, 5).map(({ emoji, text }) => (
+              <button key={text} onClick={() => handleSend(text)}
+                className="shrink-0 text-[11px] rounded-full border border-border/60 bg-card px-3 py-1.5 text-foreground whitespace-nowrap hover:border-primary/30 transition">
+                {emoji} {text.slice(0, 18)}…
+              </button>
+            ))}
+          </div>
+        )}
 
-          <div className="flex items-end gap-2 p-2">
+        <div className="flex items-end gap-2.5">
+          <div className="flex-1 rounded-2xl border border-border bg-card overflow-hidden">
             <textarea
               ref={inputRef}
               value={input}
-              onChange={(e) => {
-                setInput(e.target.value);
-                e.target.style.height = "auto";
-                e.target.style.height = Math.min(e.target.scrollHeight, 120) + "px";
-              }}
-              onKeyDown={handleKeyDown}
+              onChange={e => { setInput(e.target.value); e.target.style.height = "auto"; e.target.style.height = Math.min(e.target.scrollHeight, 120) + "px"; }}
+              onKeyDown={handleKey}
               placeholder="اسأل عن الفقه والحديث والتفسير…"
               rows={1}
-              disabled={loading}
-              className="flex-1 min-w-0 bg-transparent text-sm outline-none resize-none leading-relaxed py-2 px-2 placeholder:text-muted-foreground/60 disabled:opacity-50 max-h-[120px]"
               dir="rtl"
+              className="w-full resize-none bg-transparent px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground outline-none"
+              style={{ maxHeight: "120px", overflow: "auto" }}
             />
-            <button
-              onClick={() => send()}
-              disabled={!input.trim() || loading}
-              className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl gradient-primary text-primary-foreground shadow-glow disabled:opacity-40 disabled:shadow-none transition active:scale-90"
-              aria-label="إرسال"
-            >
-              {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4 rtl:rotate-180" />}
-            </button>
           </div>
+          <button
+            onClick={() => handleSend()}
+            disabled={!input.trim() || loading}
+            className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl text-white disabled:opacity-40 transition active:scale-90 shadow-soft"
+            style={{ background: "var(--g-primary)" }}>
+            {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : <Send className="h-5 w-5 -scale-x-100" />}
+          </button>
         </div>
-        <p className="text-center text-[10px] text-muted-foreground mt-1.5">
-          Powered by Claude AI • المصادر من كتب الإسلام الموثوقة
+
+        <p className="text-[10px] text-center text-muted-foreground/50 mt-2">
+          الردود مستندة لمصادر إسلامية • راجع العلماء في المسائل الكبيرة
         </p>
       </div>
     </div>
